@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}IP Address Plan & Configured Network - {{ output_filename }}{% endblock %}
+
+{% block content %}
+<div class="breadcrumb-bar">
+    <a href="{{ url_for('index') }}" class="back-link">&larr; Start New Plan</a>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-current">{{ output_filename }}</span>
+</div>
+
+<!-- Success Banner -->
+<div class="result-banner">
+    <div class="result-banner-icon">🎉</div>
+    <div class="result-banner-text">
+        <h1 class="result-title">IP Addresses Successfully Assigned!</h1>
+        <p class="result-subtitle">
+            Non-overlapping subnets were generated using VLSM from <code>{{ base_cidr }}</code>.
+            A new Packet Tracer file <strong>{{ output_filename }}</strong> has been created with static IP addresses, subnet masks, and default gateways configured.
+            Your original file <em>{{ filename }}</em> remains completely untouched.
+        </p>
+    </div>
+</div>
+
+<!-- Quick Actions Bar -->
+<div class="action-card">
+    <div class="action-buttons-group">
+        <a href="{{ url_for('download_file', file_type='pkt', session_id=session_id) }}" class="btn btn-primary btn-lg">
+            <span>💾 Download Configured .pkt</span>
+        </a>
+        <a href="{{ url_for('download_file', file_type='ios', session_id=session_id) }}" class="btn btn-secondary btn-lg">
+            <span>📜 Download Cisco IOS Script (.ios)</span>
+        </a>
+        <a href="{{ url_for('download_file', file_type='csv', session_id=session_id) }}" class="btn btn-outline btn-lg">
+            <span>📊 Download Address Table (.csv)</span>
+        </a>
+        {% if pt_installed %}
+        <button type="button" class="btn btn-success btn-lg" id="btnLaunchPt" onclick="launchPacketTracer('{{ session_id }}')">
+            <span>🚀 Open in Cisco Packet Tracer</span>
+        </button>
+        {% endif %}
+    </div>
+    <div id="launchStatus" class="launch-status"></div>
+</div>
+
+<!-- Validation / Status Issues if any -->
+{% if issues %}
+<div class="card alert-card">
+    <div class="card-header">
+        <div class="card-icon">📋</div>
+        <div>
+            <h2 class="card-title">Validation Summary</h2>
+            <p class="card-description">Address space, structure, and compatibility checks</p>
+        </div>
+    </div>
+    <div class="issues-list">
+        {% for issue in issues %}
+        <div class="issue-item issue-{{ issue.severity|lower }}">
+            <span class="issue-badge badge-{{ issue.severity|lower }}">{{ issue.severity }}</span>
+            <div class="issue-content">
+                <strong>{{ issue.title }}</strong>
+                <p>{{ issue.message }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Full Address Table -->
+<div class="card table-card">
+    <div class="card-header">
+        <div class="card-icon">📋</div>
+        <div>
+            <h2 class="card-title">Device Address Allocation Table</h2>
+            <p class="card-description">Explains what IP address, subnet mask, and default gateway was assigned to every device port</p>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="address-table">
+            <thead>
+                <tr>
+                    <th>Device Name</th>
+                    <th>Type</th>
+                    <th>Interface</th>
+                    <th>Subnet Name</th>
+                    <th>Assigned IP Address</th>
+                    <th>Subnet Mask</th>
+                    <th>Default Gateway</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for plan in plans %}
+                    {% for a in plan.assignments %}
+                    <tr class="role-row-{{ a.role }}">
+                        <td class="font-bold">
+                            <span class="device-icon">
+                                {% if a.device_kind == 'Router' %}🔀{% elif a.device_kind == 'Switch' %}⏹️{% else %}💻{% endif %}
+                            </span>
+                            {{ a.device_name }}
+                        </td>
+                        <td><span class="kind-badge">{{ a.device_kind }}</span></td>
+                        <td><code class="font-mono">{{ a.port_name }}</code></td>
+                        <td><span class="subnet-tag">{{ plan.name }}</span></td>
+                        <td><strong class="font-mono text-primary">{{ a.ip }}</strong>/{{ plan.prefix }}</td>
+                        <td><code class="font-mono">{{ a.netmask }}</code></td>
+                        <td>
+                            {% if a.gateway %}
+                                <code class="font-mono">{{ a.gateway }}</code>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="role-pill pill-{{ a.role }}">
+                                {{ a.role|capitalize }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- VLSM Subnet Breakdown -->
+<div class="card vlsm-card">
+    <div class="card-header">
+        <div class="card-icon">🧮</div>
+        <div>
+            <h2 class="card-title">VLSM Subnet Block Allocations</h2>
+            <p class="card-description">Detailed mathematical breakdown of each calculated subnet block</p>
+        </div>
+    </div>
+
+    <div class="subnets-summary-grid">
+        {% for plan in plans %}
+        <div class="vlsm-subnet-block">
+            <div class="vlsm-header">
+                <h3>{{ plan.name }}</h3>
+                <span class="cidr-badge font-mono">{{ plan.network.with_prefixlen }}</span>
+            </div>
+            <div class="vlsm-body">
+                <div class="vlsm-metric">
+                    <span class="metric-label">Network Address:</span>
+                    <span class="metric-val font-mono">{{ plan.network.network_address }}</span>
+                </div>
+                <div class="vlsm-metric">
+                    <span class="metric-label">Usable Host Range:</span>
+                    <span class="metric-val font-mono">{{ plan.usable_range[0] }} &rarr; {{ plan.usable_range[1] }}</span>
+                </div>
+                <div class="vlsm-metric">
+                    <span class="metric-label">Broadcast Address:</span>
+                    <span class="metric-val font-mono">{{ plan.broadcast }}</span>
+                </div>
+                <div class="vlsm-metric">
+                    <span class="metric-label">Subnet Mask:</span>
+                    <span class="metric-val font-mono">{{ plan.netmask }} (/{ plan.prefix })</span>
+                </div>
+                <div class="vlsm-metric">
+                    <span class="metric-label">Capacity:</span>
+                    <span class="metric-val"><strong>{{ plan.allocated_hosts }}</strong> usable addresses (needed {{ plan.needed_hosts }})</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Static Routes if Multi-Router -->
+{% if static_routes %}
+    {% set has_routes = false %}
+    {% for r_name, r_list in static_routes.items() %}
+        {% if r_list %}
+            {% set has_routes = true %}
+        {% endif %}
+    {% endfor %}
+
+    {% if has_routes %}
+    <div class="card routes-card">
+        <div class="card-header">
+            <div class="card-icon">🛤️</div>
+            <div>
+                <h2 class="card-title">Inter-Subnet Static Routing Configuration</h2>
+                <p class="card-description">Static routes configured on routers to ensure end-to-end communication across multiple router hops</p>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="address-table">
+                <thead>
+                    <tr>
+                        <th>Router</th>
+                        <th>Destination Subnet</th>
+                        <th>Subnet Mask</th>
+                        <th>Next-Hop IP</th>
+                        <th>Cisco IOS Command</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r_name, r_list in static_routes.items() %}
+                        {% for route in r_list %}
+                        <tr>
+                            <td><strong>{{ r_name }}</strong></td>
+                            <td><code class="font-mono">{{ route.destination_network }}</code></td>
+                            <td><code class="font-mono">{{ route.destination_mask }}</code></td>
+                            <td><code class="font-mono">{{ route.next_hop_ip }}</code></td>
+                            <td><code class="font-mono command-snippet">{{ route.ios_command }}</code></td>
+                        </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+{% endif %}
+
+<!-- Ping Testing Guide -->
+<div class="card guide-card">
+    <div class="card-header">
+        <div class="card-icon">🧪</div>
+        <div>
+            <h2 class="card-title">How to Test Your Network Using Ping in Packet Tracer</h2>
+            <p class="card-description">Follow these beginner-friendly steps to verify communication</p>
+        </div>
+    </div>
+
+    <div class="guide-steps-list">
+        <div class="guide-step">
+            <div class="step-badge">Method 1</div>
+            <div class="step-details">
+                <h4>Using the Command Prompt inside a PC</h4>
+                <ol>
+                    <li>Open <code>{{ output_filename }}</code> in Cisco Packet Tracer.</li>
+                    <li>Click on <strong>PC1</strong> (or any PC).</li>
+                    <li>Switch to the <strong>Desktop</strong> tab and click <strong>Command Prompt</strong>.</li>
+                    <li>Type <code>ping {{ plans[0].gateway_ip }}</code> to test the local default gateway.</li>
+                    <li>Type <code>ping {{ plans[-1].assignments[-1].ip }}</code> to test pinging across subnets to <strong>{{ plans[-1].assignments[-1].device_name }}</strong>!</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="guide-step">
+            <div class="step-badge">Method 2</div>
+            <div class="step-details">
+                <h4>Using the Pre-configured Ping PDUs</h4>
+                <p>
+                    Our application automatically placed <strong>ICMP Echo PDUs</strong> inside the file!
+                    Look at the bottom-right corner of Packet Tracer under <em>User Created Packet Window</em>. Click the <strong>Fire</strong> button or switch to <strong>Simulation Mode</strong> to watch packets travel across the switches and router!
+                </p>
+            </div>
+        </div>
+
+        <div class="tip-box">
+            <span class="tip-icon">💡</span>
+            <div class="tip-body">
+                <strong>Why does the first ping show "Request timed out"?</strong>
+                <p>
+                    This is completely normal in computer networking! Switches run <strong>STP (Spanning Tree Protocol)</strong> which takes ~30 seconds to transition switchports from Blocking &rarr; Listening &rarr; Learning &rarr; Forwarding (green lights). Additionally, routers and PCs send <strong>ARP (Address Resolution Protocol)</strong> broadcast requests to learn MAC addresses before ICMP packets can be transmitted.
+                    If the first ping times out, simply press the <strong>Fast Forward Time</strong> button (<code>&gt;&gt;</code> in the bottom toolbar) or re-run the ping!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function launchPacketTracer(sessionId) {
+    const btn = document.getElementById('btnLaunchPt');
+    const statusDiv = document.getElementById('launchStatus');
+    btn.disabled = true;
+    btn.innerHTML = '<span>Launching Packet Tracer...</span>';
+
+    fetch('/api/open-pt/' + sessionId, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = '<span>🚀 Open in Cisco Packet Tracer</span>';
+            if (data.success) {
+                statusDiv.innerHTML = '<span class="text-success">✅ ' + data.message + '</span>';
+            } else {
+                statusDiv.innerHTML = '<span class="text-danger">⚠️ ' + data.error + '</span>';
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerHTML = '<span>🚀 Open in Cisco Packet Tracer</span>';
+            statusDiv.innerHTML = '<span class="text-danger">Error contacting server: ' + err + '</span>';
+        });
+}
+</script>
+{% endblock %}

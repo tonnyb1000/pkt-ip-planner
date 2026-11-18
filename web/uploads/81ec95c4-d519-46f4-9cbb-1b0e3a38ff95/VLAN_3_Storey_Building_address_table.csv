@@ -1,0 +1,13 @@
+Device Name,Device Type,Interface,Subnet ID,Subnet Name,Assigned IP,Subnet Mask,Prefix,Default Gateway,Role
+PC1-F1-ADMIN,Pc,FastEthernet0,subnet_1,Isolated LAN 1,192.168.1.1,255.255.255.240,/28,,host
+PC10-F3-FINANCE,Pc,FastEthernet0,subnet_1,Isolated LAN 1,192.168.1.2,255.255.255.240,/28,,host
+PC11-F3-IT,Pc,FastEthernet0,subnet_1,Isolated LAN 1,192.168.1.3,255.255.255.240,/28,,host
+PC12-F3-IT,Pc,FastEthernet0,subnet_1,Isolated LAN 1,192.168.1.4,255.255.255.240,/28,,host
+PC2-F1-ADMIN,Pc,FastEthernet0,subnet_1,Isolated LAN 1,192.168.1.5,255.255.255.240,/28,,host
+PC3-F1-FINANCE,Pc,FastEthernet0,subnet_1,Isolated LAN 1,192.168.1.6,255.255.255.240,/28,,host
+PC4-F1-IT,Pc,FastEthernet0,subnet_1,Isolated LAN 1,192.168.1.7,255.255.255.240,/28,,host
+PC5-F2-ADMIN,Pc,FastEthernet0,subnet_1,Isolated LAN 1,192.168.1.8,255.255.255.240,/28,,host
+PC6-F2-FINANCE,Pc,FastEthernet0,subnet_1,Isolated LAN 1,192.168.1.9,255.255.255.240,/28,,host
+PC7-F2-FINANCE,Pc,FastEthernet0,subnet_1,Isolated LAN 1,192.168.1.10,255.255.255.240,/28,,host
+PC8-F2-IT,Pc,FastEthernet0,subnet_1,Isolated LAN 1,192.168.1.11,255.255.255.240,/28,,host
+PC9-F3-ADMIN,Pc,FastEthernet0,subnet_1,Isolated LAN 1,192.168.1.12,255.255.255.240,/28,,host

@@ -1,0 +1,4 @@
+pktlib>=0.2.2
+packet-tracer-pkt-format>=0.4.1
+flask>=3.0.0
+pytest>=8.0.0

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Start IP Planning - Cisco Packet Tracer{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="hero-title">Automate IP Addressing for Cisco Packet Tracer</h1>
+    <p class="hero-subtitle">
+        Upload your network topology (.pkt), specify a base address, and let our engine automatically detect subnets, compute VLSM masks, configure router interfaces, and output a verified Packet Tracer file ready for ping testing.
+    </p>
+</div>
+
+<div class="planner-grid">
+    <!-- Card 1: Upload Your .pkt -->
+    <div class="card upload-card">
+        <div class="card-header">
+            <div class="card-icon">📁</div>
+            <div>
+                <h2 class="card-title">Upload Network File (.pkt)</h2>
+                <p class="card-description">Upload your saved topology from Cisco Packet Tracer</p>
+            </div>
+        </div>
+
+        <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" class="upload-form">
+            <div class="drop-zone" id="dropZone">
+                <input type="file" name="pkt_file" id="pktFileInput" accept=".pkt,.pka" class="file-input">
+                <div class="drop-zone-prompt">
+                    <span class="upload-emoji">📤</span>
+                    <p><strong>Click to browse</strong> or drag & drop your <code>.pkt</code> file here</p>
+                    <span class="file-chosen-text" id="fileChosenText">No file chosen</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="base_cidr" class="form-label">
+                    Starting Network Address (CIDR):
+                </label>
+                <input type="text" name="base_cidr" id="base_cidr" value="192.168.1.0/24" placeholder="e.g. 192.168.1.0/24" class="form-control font-mono">
+                <div class="preset-pills">
+                    <span class="preset-label">Presets:</span>
+                    <button type="button" class="preset-pill" onclick="setPreset('192.168.1.0/24')">192.168.1.0/24 (Class C)</button>
+                    <button type="button" class="preset-pill" onclick="setPreset('10.0.0.0/16')">10.0.0.0/16 (Class A)</button>
+                    <button type="button" class="preset-pill" onclick="setPreset('172.16.0.0/20')">172.16.0.0/20 (Class B)</button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                <span>Analyze Network & Subnets</span> &rarr;
+            </button>
+        </form>
+    </div>
+
+    <!-- Card 2: 2-LANs Starter Example -->
+    <div class="card sample-card">
+        <div class="card-header">
+            <div class="card-icon">⚡</div>
+            <div>
+                <h2 class="card-title">Try Starter Example (2 LANs)</h2>
+                <p class="card-description">Instant test with no file upload required</p>
+            </div>
+        </div>
+
+        <div class="sample-content">
+            <div class="sample-topology-preview">
+                <div class="preview-diagram">
+                    <span class="node-tag router-tag">Router R1</span>
+                    <div class="branch-lines">
+                        <div class="branch">
+                            <span class="branch-line"></span>
+                            <span class="node-tag switch-tag">SW1 (LAN 1)</span>
+                            <span class="sub-nodes">PC1 &bull; PC2</span>
+                        </div>
+                        <div class="branch">
+                            <span class="branch-line"></span>
+                            <span class="node-tag switch-tag">SW2 (LAN 2)</span>
+                            <span class="sub-nodes">PC3 &bull; PC4</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="sample-info">
+                Generates a clean topology consisting of <strong>two independent LANs</strong> connected through Cisco Router R1. Perfect for testing subnet boundaries, gateway allocation, and inter-LAN pinging.
+            </p>
+
+            <form action="{{ url_for('upload_file') }}" method="POST">
+                <input type="hidden" name="use_sample" value="true">
+                <div class="form-group">
+                    <label class="form-label">Base Network Block:</label>
+                    <input type="text" name="base_cidr" value="192.168.1.0/24" class="form-control font-mono">
+                </div>
+                <button type="submit" class="btn btn-secondary btn-block">
+                    <span>Load 2-LANs Starter Example</span> &rarr;
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="guide-section">
+    <h2 class="section-title">How It Works</h2>
+    <div class="steps-grid">
+        <div class="step-card">
+            <div class="step-num">1</div>
+            <h3>Build in Packet Tracer</h3>
+            <p>Connect your PCs, switches, and routers with cables in Cisco Packet Tracer. Save your workspace as a standard <code>.pkt</code> file.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-num">2</div>
+            <h3>Upload & Detect</h3>
+            <p>Our graph traversal engine automatically detects Layer 2 broadcast domains, identifies default gateways, and proposes non-overlapping subnets.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-num">3</div>
+            <h3>Review & VLSM</h3>
+            <p>Confirm detected subnet boundaries and adjust spare IP padding. The VLSM algorithm calculates optimal subnet masks to avoid address waste.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-num">4</div>
+            <h3>Download & Ping Test</h3>
+            <p>Get a newly configured <code>.pkt</code> file with static IPs and router interfaces set. Open it in Packet Tracer and test pings immediately!</p>
+        </div>
+    </div>
+</section>
+
+<script>
+function setPreset(val) {
+    document.getElementById('base_cidr').value = val;
+}
+
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('pktFileInput');
+const fileChosenText = document.getElementById('fileChosenText');
+
+fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+        fileChosenText.textContent = 'Selected: ' + fileInput.files[0].name;
+        dropZone.classList.add('has-file');
+    }
+});
+
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('drag-over');
+});
+
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('drag-over');
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    if (e.dataTransfer.files.length > 0) {
+        fileInput.files = e.dataTransfer.files;
+        fileChosenText.textContent = 'Selected: ' + fileInput.files[0].name;
+        dropZone.classList.add('has-file');
+    }
+});
+</script>
+{% endblock %}

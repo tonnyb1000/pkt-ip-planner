@@ -1,0 +1,7 @@
+Device Name,Device Type,Interface,Subnet ID,Subnet Name,Assigned IP,Subnet Mask,Prefix,Default Gateway,Role
+R1,Router,FastEthernet0/0,subnet_1,LAN 1 (R1 FastEthernet0/0),192.168.1.1,255.255.255.248,/29,192.168.1.1,gateway
+PC1,Pc,FastEthernet0,subnet_1,LAN 1 (R1 FastEthernet0/0),192.168.1.2,255.255.255.248,/29,192.168.1.1,host
+PC2,Pc,FastEthernet0,subnet_1,LAN 1 (R1 FastEthernet0/0),192.168.1.3,255.255.255.248,/29,192.168.1.1,host
+R1,Router,FastEthernet0/1,subnet_2,LAN 2 (R1 FastEthernet0/1),192.168.1.9,255.255.255.248,/29,192.168.1.9,gateway
+PC3,Pc,FastEthernet0,subnet_2,LAN 2 (R1 FastEthernet0/1),192.168.1.10,255.255.255.248,/29,192.168.1.9,host
+PC4,Pc,FastEthernet0,subnet_2,LAN 2 (R1 FastEthernet0/1),192.168.1.11,255.255.255.248,/29,192.168.1.9,host

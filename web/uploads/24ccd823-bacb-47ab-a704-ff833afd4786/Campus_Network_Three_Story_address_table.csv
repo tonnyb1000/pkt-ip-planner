@@ -1,0 +1,25 @@
+Device Name,Device Type,Interface,Subnet ID,Subnet Name,Assigned IP,Subnet Mask,Prefix,Default Gateway,Role
+MLS-L1,MultiLayerSwitch,Vlan10,subnet_1,VLAN 10 (MLS-L1 Vlan10),192.168.1.25,255.255.255.252,/30,192.168.1.25,gateway
+PC-Auditorium,Pc,FastEthernet0,subnet_1,VLAN 10 (MLS-L1 Vlan10),192.168.1.26,255.255.255.252,/30,192.168.1.25,host
+MLS-L2,MultiLayerSwitch,Vlan20,subnet_2,VLAN 20 (MLS-L2 Vlan20),192.168.1.1,255.255.255.248,/29,192.168.1.1,gateway
+PC-Lecturer1,Pc,FastEthernet0,subnet_2,VLAN 20 (MLS-L2 Vlan20),192.168.1.2,255.255.255.248,/29,192.168.1.1,host
+PC-Lecturer2,Pc,FastEthernet0,subnet_2,VLAN 20 (MLS-L2 Vlan20),192.168.1.3,255.255.255.248,/29,192.168.1.1,host
+Laptop-Boardroom,Laptop,FastEthernet0,subnet_2,VLAN 20 (MLS-L2 Vlan20),192.168.1.4,255.255.255.248,/29,192.168.1.1,host
+MLS-L3,MultiLayerSwitch,Vlan30,subnet_3,VLAN 30 (MLS-L3 Vlan30),192.168.1.9,255.255.255.248,/29,192.168.1.9,gateway
+PC-Admin1,Pc,FastEthernet0,subnet_3,VLAN 30 (MLS-L3 Vlan30),192.168.1.10,255.255.255.248,/29,192.168.1.9,host
+PC-Admin2,Pc,FastEthernet0,subnet_3,VLAN 30 (MLS-L3 Vlan30),192.168.1.11,255.255.255.248,/29,192.168.1.9,host
+MLS-L1,MultiLayerSwitch,Vlan40,subnet_4,VLAN 40 (MLS-L1 Vlan40),192.168.1.29,255.255.255.252,/30,192.168.1.29,gateway
+PC-Reception,Pc,FastEthernet0,subnet_4,VLAN 40 (MLS-L1 Vlan40),192.168.1.30,255.255.255.252,/30,192.168.1.29,host
+MLS-L3,MultiLayerSwitch,Vlan50,subnet_5,VLAN 50 (MLS-L3 Vlan50),192.168.1.17,255.255.255.248,/29,192.168.1.17,gateway
+Server-DHCP,Server,FastEthernet0,subnet_5,VLAN 50 (MLS-L3 Vlan50),192.168.1.18,255.255.255.248,/29,192.168.1.17,host
+Server-FTP,Server,FastEthernet0,subnet_5,VLAN 50 (MLS-L3 Vlan50),192.168.1.19,255.255.255.248,/29,192.168.1.17,host
+MLS-L1,MultiLayerSwitch,Vlan99,subnet_6,VLAN 99 (MLS-L1 Vlan99),192.168.1.45,255.255.255.252,/30,192.168.1.45,gateway
+R1-LEVEL1,Router,GigabitEthernet0/0,subnet_7,WAN Link (R1-LEVEL1-R2-LEVEL2),192.168.1.33,255.255.255.252,/30,192.168.1.33,gateway
+R2-LEVEL2,Router,GigabitEthernet0/0,subnet_7,WAN Link (R1-LEVEL1-R2-LEVEL2),192.168.1.34,255.255.255.252,/30,192.168.1.33,transit
+R1-LEVEL1,Router,GigabitEthernet0/1,subnet_8,WAN Link (R1-LEVEL1-R3-LEVEL3),192.168.1.37,255.255.255.252,/30,192.168.1.37,gateway
+R3-LEVEL3,Router,GigabitEthernet0/1,subnet_8,WAN Link (R1-LEVEL1-R3-LEVEL3),192.168.1.38,255.255.255.252,/30,192.168.1.37,transit
+R1-LEVEL1,Router,GigabitEthernet0/2,subnet_9,LAN 9 (R1-LEVEL1 GigabitEthernet0/2),192.168.1.49,255.255.255.252,/30,192.168.1.49,gateway
+R2-LEVEL2,Router,GigabitEthernet0/1,subnet_10,WAN Link (R2-LEVEL2-R3-LEVEL3),192.168.1.41,255.255.255.252,/30,192.168.1.41,gateway
+R3-LEVEL3,Router,GigabitEthernet0/0,subnet_10,WAN Link (R2-LEVEL2-R3-LEVEL3),192.168.1.42,255.255.255.252,/30,192.168.1.41,transit
+R2-LEVEL2,Router,GigabitEthernet0/2,subnet_11,LAN 11 (R2-LEVEL2 GigabitEthernet0/2),192.168.1.53,255.255.255.252,/30,192.168.1.53,gateway
+R3-LEVEL3,Router,GigabitEthernet0/2,subnet_12,LAN 12 (R3-LEVEL3 GigabitEthernet0/2),192.168.1.57,255.255.255.252,/30,192.168.1.57,gateway
